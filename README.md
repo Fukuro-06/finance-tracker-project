@@ -10,10 +10,10 @@ Analisis:
 Proses build dan run adalah langkah standar dalam pengembangan Java.
 File database akan otomatis dibuat jika belum ada, memudahkan pengguna tanpa perlu konfigurasi tambahan.
 
-Fitur Utama Aplikasi
-Tambah Transaksi: Input pemasukan/pengeluaran dengan kategori.
-Lihat Riwayat: Daftar transaksi dengan filter.
-Dashboard: Ringkasan total pemasukan, pengeluaran, dan saldo.
-Kategori: Manajemen kategori transaksi.
-Laporan: Statistik keuangan per periode.
-Cetak Laporan: Export laporan keuangan dalam bentuk PDF/Excel
+Highlight Fitur Utama Aplikasi
+1. Tambah Transaksi: Input pemasukan/pengeluaran dengan kategori.
+2. Lihat Riwayat: Daftar transaksi dengan filter.
+3. Dashboard: Ringkasan total pemasukan, pengeluaran, dan saldo.
+4. Kategori: Manajemen kategori transaksi.
+5. Laporan: Statistik keuangan per periode.
+6. Cetak Laporan: Cetak dan Export laporan keuangan dalam bentuk PDF/Excel
