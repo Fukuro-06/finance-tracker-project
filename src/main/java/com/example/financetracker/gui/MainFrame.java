@@ -11,6 +11,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.List;
@@ -22,28 +23,28 @@ public class MainFrame extends JFrame {
     private JTable tabelTransaksi;
     private DefaultTableModel tableModel;
     private NumberFormat currencyFormat;
-    
+
     public MainFrame() {
         this.transaksiDAO = new TransaksiDAO();
         this.currencyFormat = NumberFormat.getCurrencyInstance(new Locale("id", "ID"));
-        
+
         initializeComponents();
         setupLayout();
         loadData();
         updateDashboard();
     }
-    
+
     private void initializeComponents() {
         setTitle("Pencatat Keuangan Pribadi");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(900, 600);
         setLocationRelativeTo(null);
-        
+
         // Dashboard Labels
         lblTotalPemasukan = new JLabel("Rp 0");
         lblTotalPengeluaran = new JLabel("Rp 0");
         lblSaldo = new JLabel("Rp 0");
-        
+
         // Table
         String[] columnNames = {"ID", "Tanggal", "Kategori", "Deskripsi", "Jenis", "Jumlah"};
         tableModel = new DefaultTableModel(columnNames, 0) {
@@ -55,29 +56,29 @@ public class MainFrame extends JFrame {
         tabelTransaksi = new JTable(tableModel);
         tabelTransaksi.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     }
-    
+
     private void setupLayout() {
         setLayout(new BorderLayout());
-        
+
         // Top Panel - Dashboard
         JPanel dashboardPanel = createDashboardPanel();
         add(dashboardPanel, BorderLayout.NORTH);
-        
+
         // Center Panel - Table
         JScrollPane scrollPane = new JScrollPane(tabelTransaksi);
         scrollPane.setBorder(BorderFactory.createTitledBorder("Riwayat Transaksi"));
         add(scrollPane, BorderLayout.CENTER);
-        
+
         // Bottom Panel - Buttons
         JPanel buttonPanel = createButtonPanel();
         add(buttonPanel, BorderLayout.SOUTH);
     }
-    
+
     private JPanel createDashboardPanel() {
         JPanel panel = new JPanel(new GridLayout(1, 3, 10, 10));
         panel.setBorder(BorderFactory.createTitledBorder("Dashboard Keuangan"));
         panel.setPreferredSize(new Dimension(0, 80));
-        
+
         // Pemasukan Panel
         JPanel pemasukanPanel = new JPanel(new BorderLayout());
         pemasukanPanel.setBorder(BorderFactory.createEtchedBorder());
@@ -87,7 +88,7 @@ public class MainFrame extends JFrame {
         lblTotalPemasukan.setFont(new Font("Arial", Font.BOLD, 16));
         lblTotalPemasukan.setForeground(new Color(0, 150, 0));
         pemasukanPanel.add(lblTotalPemasukan, BorderLayout.CENTER);
-        
+
         // Pengeluaran Panel
         JPanel pengeluaranPanel = new JPanel(new BorderLayout());
         pengeluaranPanel.setBorder(BorderFactory.createEtchedBorder());
@@ -97,7 +98,7 @@ public class MainFrame extends JFrame {
         lblTotalPengeluaran.setFont(new Font("Arial", Font.BOLD, 16));
         lblTotalPengeluaran.setForeground(new Color(200, 0, 0));
         pengeluaranPanel.add(lblTotalPengeluaran, BorderLayout.CENTER);
-        
+
         // Saldo Panel
         JPanel saldoPanel = new JPanel(new BorderLayout());
         saldoPanel.setBorder(BorderFactory.createEtchedBorder());
@@ -107,22 +108,24 @@ public class MainFrame extends JFrame {
         lblSaldo.setFont(new Font("Arial", Font.BOLD, 18));
         lblSaldo.setForeground(new Color(0, 0, 150));
         saldoPanel.add(lblSaldo, BorderLayout.CENTER);
-        
+
         panel.add(pemasukanPanel);
         panel.add(pengeluaranPanel);
         panel.add(saldoPanel);
-        
+
         return panel;
     }
-    
+
     private JPanel createButtonPanel() {
         JPanel panel = new JPanel(new FlowLayout());
-        
+
         JButton btnTambah = new JButton("Tambah Transaksi");
         JButton btnEdit = new JButton("Edit Transaksi");
         JButton btnHapus = new JButton("Hapus Transaksi");
         JButton btnRefresh = new JButton("Refresh");
-        
+        JButton btnExportExcel = new JButton("Export to Excel");
+        JButton exportPDFButton = new JButton("Export to PDF");
+
         btnTambah.addActionListener(e -> openTambahTransaksiDialog());
         btnEdit.addActionListener(e -> editTransaksi());
         btnHapus.addActionListener(e -> hapusTransaksi());
@@ -130,25 +133,80 @@ public class MainFrame extends JFrame {
             loadData();
             updateDashboard();
         });
+
+        // Aksi untuk tombol Export to Excel
+        btnExportExcel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Simpan File Excel");
+                fileChooser.setApproveButtonText("Simpan");
+                int userSelection = fileChooser.showSaveDialog(MainFrame.this);
+
+                if (userSelection == JFileChooser.APPROVE_OPTION) {
+                    File fileToSave = fileChooser.getSelectedFile();
+                    String filePath = fileToSave.getAbsolutePath();
+
+                    if (!filePath.endsWith(".xlsx")) {
+                        filePath += ".xlsx";
+                    }
+
+                    try {
+                        transaksiDAO.exportToExcel(filePath, transaksiDAO.getAllTransaksi());
+                        JOptionPane.showMessageDialog(MainFrame.this, "Data berhasil diekspor ke Excel!");
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(MainFrame.this, "Gagal mengekspor data: " + ex.getMessage(), 
+                                                "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
         
+        // Aksi untuk tombol Export to PDF
+        exportPDFButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Simpan File PDF");
+                fileChooser.setApproveButtonText("Simpan");
+                int userSelection = fileChooser.showSaveDialog(MainFrame.this);
+
+                if (userSelection == JFileChooser.APPROVE_OPTION) {
+                    File fileToSave = fileChooser.getSelectedFile();
+                    String filePath = fileToSave.getAbsolutePath();
+
+                    if (!filePath.endsWith(".pdf")) {
+                        filePath += ".pdf";
+                    }
+
+                    List<Transaksi> transaksiList = transaksiDAO.getAllTransaksi();
+                    transaksiDAO.exportToPDF(filePath, transaksiList);
+
+                    JOptionPane.showMessageDialog(MainFrame.this, "Data berhasil diekspor ke PDF!");
+                }
+            }
+        });
+
         panel.add(btnTambah);
         panel.add(btnEdit);
         panel.add(btnHapus);
         panel.add(btnRefresh);
-        
+        panel.add(btnExportExcel); // Tambahkan tombol Export ke panel
+        panel.add(exportPDFButton);
+
         return panel;
     }
-    
+
     private void openTambahTransaksiDialog() {
         TambahTransaksiDialog dialog = new TambahTransaksiDialog(this, transaksiDAO);
         dialog.setVisible(true);
-        
+
         if (dialog.isTransaksiAdded()) {
             loadData();
             updateDashboard();
         }
     }
-    
+
     private void editTransaksi() {
         int selectedRow = tabelTransaksi.getSelectedRow();
         if (selectedRow == -1) {
@@ -156,17 +214,17 @@ public class MainFrame extends JFrame {
                                         "Peringatan", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
+
         int transaksiId = (Integer) tableModel.getValueAt(selectedRow, 0);
         EditTransaksiDialog dialog = new EditTransaksiDialog(this, transaksiDAO, transaksiId);
         dialog.setVisible(true);
-        
+
         if (dialog.isTransaksiUpdated()) {
             loadData();
             updateDashboard();
         }
     }
-    
+
     private void hapusTransaksi() {
         int selectedRow = tabelTransaksi.getSelectedRow();
         if (selectedRow == -1) {
@@ -174,11 +232,11 @@ public class MainFrame extends JFrame {
                                         "Peringatan", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
+
         int confirm = JOptionPane.showConfirmDialog(this, 
             "Apakah Anda yakin ingin menghapus transaksi ini?", 
             "Konfirmasi Hapus", JOptionPane.YES_NO_OPTION);
-        
+
         if (confirm == JOptionPane.YES_OPTION) {
             int transaksiId = (Integer) tableModel.getValueAt(selectedRow, 0);
             if (transaksiDAO.hapusTransaksi(transaksiId)) {
@@ -191,11 +249,11 @@ public class MainFrame extends JFrame {
             }
         }
     }
-    
+
     private void loadData() {
         tableModel.setRowCount(0);
         List<Transaksi> transaksiList = transaksiDAO.getAllTransaksi();
-        
+
         for (Transaksi transaksi : transaksiList) {
             Object[] rowData = {
                 transaksi.getId(),
@@ -208,16 +266,16 @@ public class MainFrame extends JFrame {
             tableModel.addRow(rowData);
         }
     }
-    
+
     private void updateDashboard() {
         BigDecimal totalPemasukan = transaksiDAO.getTotalPemasukan();
         BigDecimal totalPengeluaran = transaksiDAO.getTotalPengeluaran();
         BigDecimal saldo = totalPemasukan.subtract(totalPengeluaran);
-        
+
         lblTotalPemasukan.setText(currencyFormat.format(totalPemasukan));
         lblTotalPengeluaran.setText(currencyFormat.format(totalPengeluaran));
         lblSaldo.setText(currencyFormat.format(saldo));
-        
+
         // Ubah warna saldo berdasarkan nilai
         if (saldo.compareTo(BigDecimal.ZERO) > 0) {
             lblSaldo.setForeground(new Color(0, 150, 0));
