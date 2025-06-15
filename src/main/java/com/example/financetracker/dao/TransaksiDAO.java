@@ -7,10 +7,20 @@ package com.example.financetracker.dao;
 import com.example.financetracker.database.DatabaseManager;
 import com.example.financetracker.model.Transaksi;
 import java.sql.*;
-import java.time.LocalDate;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.properties.UnitValue;
+import java.io.FileNotFoundException;
 
 public class TransaksiDAO {
     
@@ -147,5 +157,87 @@ public class TransaksiDAO {
             e.printStackTrace();
         }
         return BigDecimal.ZERO;
+    }
+    
+    public void exportToExcel(String filePath, List<Transaksi> transaksiList) {
+        Workbook workbook = new XSSFWorkbook(); // Untuk .xlsx
+        Sheet sheet = workbook.createSheet("Transaksi");
+
+        // Header kolom
+        Row headerRow = sheet.createRow(0);
+        headerRow.createCell(0).setCellValue("ID");
+        headerRow.createCell(1).setCellValue("Tanggal");
+        headerRow.createCell(2).setCellValue("Kategori");
+        headerRow.createCell(3).setCellValue("Deskripsi");
+        headerRow.createCell(4).setCellValue("Jenis");
+        headerRow.createCell(5).setCellValue("Jumlah");
+
+        // Isi data
+        int rowNum = 1;
+        for (Transaksi transaksi : transaksiList) {
+            Row row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(transaksi.getId());
+            row.createCell(1).setCellValue(transaksi.getTanggal().toString());
+            row.createCell(2).setCellValue(transaksi.getKategori());
+            row.createCell(3).setCellValue(transaksi.getDeskripsi());
+            row.createCell(4).setCellValue(transaksi.getJenis().toString());
+            row.createCell(5).setCellValue(transaksi.getJumlah().toString());
+        }
+
+        // Autofit kolom
+        for (int i = 0; i < 6; i++) {
+            sheet.autoSizeColumn(i);
+        }
+
+        // Simpan ke file
+        try (FileOutputStream fos = new FileOutputStream(filePath)) {
+            workbook.write(fos);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                workbook.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    public void exportToPDF(String filePath, List<Transaksi> transaksiList) {
+        try {
+            PdfWriter writer = new PdfWriter(filePath);
+            PdfDocument pdfDoc = new PdfDocument(writer);
+            Document document = new Document(pdfDoc);
+
+            // Judul dokumen
+            document.add(new Paragraph("Laporan Transaksi").setFontSize(16).setBold());
+
+            // Tabel
+            Table table = new Table(UnitValue.createPercentArray(new float[]{1, 2, 3, 4, 2, 2}))
+                    .setWidth(UnitValue.createPercentValue(100));
+
+            // Header kolom
+            table.addCell("ID");
+            table.addCell("Tanggal");
+            table.addCell("Kategori");
+            table.addCell("Deskripsi");
+            table.addCell("Jenis");
+            table.addCell("Jumlah");
+
+            // Isi data
+            for (Transaksi transaksi : transaksiList) {
+                table.addCell(String.valueOf(transaksi.getId()));
+                table.addCell(transaksi.getTanggal().toString());
+                table.addCell(transaksi.getKategori());
+                table.addCell(transaksi.getDeskripsi());
+                table.addCell(transaksi.getJenis().toString());
+                table.addCell(transaksi.getJumlah().toString());
+            }
+
+            document.add(table);
+            document.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }
