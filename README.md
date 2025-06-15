@@ -1,9 +1,9 @@
-PENCATAT KEUANGAN PRIBADI
+[ PENCATAT KEUANGAN PRIBADI ]
 
 Cara Menjalankan Aplikasi
 Langkah-langkah:
-1. Build project: Klik kanan project → Clean and Build .
-2. Run: Klik kanan project → Run .
+1. Build project: Klik kanan project → Clean and Build.
+2. Run: Klik kanan project → Run.
 3. File finance.db akan otomatis dibuat di folder root proyek.
    
 Analisis:
