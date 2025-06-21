@@ -191,8 +191,8 @@ public class MainFrame extends JFrame {
         panel.add(btnEdit);
         panel.add(btnHapus);
         panel.add(btnRefresh);
-        panel.add(btnExportExcel); // Tambahkan tombol Export ke panel
-        panel.add(exportPDFButton);
+        panel.add(btnExportExcel); // Tambahkan tombol Export Excel ke panel
+        panel.add(exportPDFButton); // Tambahkan tombol Export PDF ke panel
 
         return panel;
     }
