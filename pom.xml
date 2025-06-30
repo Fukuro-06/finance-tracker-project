@@ -5,7 +5,7 @@
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     
-    <groupId>com.example</groupId>
+    <groupId>com.one</groupId>
     <artifactId>finance-tracker</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -23,11 +23,18 @@
             <version>3.42.0.0</version>
         </dependency>
 
-        <!-- Swing Look and Feel -->
+        <!-- Swing untuk Tampilan -->
         <dependency>
             <groupId>com.formdev</groupId>
             <artifactId>flatlaf</artifactId>
             <version>3.2</version>
+        </dependency>
+        
+        <!-- JFree Chart untuk Visualisasi Grafik -->
+        <dependency>
+             <groupId>org.jfree</groupId>
+             <artifactId>jfreechart</artifactId>
+             <version>1.5.3</version>
         </dependency>
 
         <!-- Apache POI (untuk Excel) -->
