@@ -2,16 +2,15 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.example.financetracker.gui;
+package com.one.financetracker.gui;
 
-import com.example.financetracker.dao.TransaksiDAO;
-import com.example.financetracker.model.Transaksi;
+import com.one.financetracker.dao.TransaksiDAO;
+import com.one.financetracker.model.Transaksi;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class TambahTransaksiDialog extends JDialog {
@@ -59,6 +58,7 @@ public class TambahTransaksiDialog extends JDialog {
             cmbKategori.addItem("Gaji");
             cmbKategori.addItem("Bonus");
             cmbKategori.addItem("Investasi");
+            cmbKategori.addItem("Tabungan");
             cmbKategori.addItem("Lain-lain");
         } else {
             cmbKategori.addItem("Makanan");
@@ -66,6 +66,7 @@ public class TambahTransaksiDialog extends JDialog {
             cmbKategori.addItem("Belanja");
             cmbKategori.addItem("Tagihan");
             cmbKategori.addItem("Hiburan");
+            cmbKategori.addItem("Lain-lain");
         }
     }
     
@@ -75,7 +76,7 @@ public class TambahTransaksiDialog extends JDialog {
         // Form Panel
         JPanel formPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(5, 2, 10, 10);
         gbc.anchor = GridBagConstraints.WEST;
         
         // Row 0 - Tanggal
@@ -98,7 +99,7 @@ public class TambahTransaksiDialog extends JDialog {
         
         // Row 3 - Deskripsi
         gbc.gridx = 0; gbc.gridy = 3; gbc.fill = GridBagConstraints.NONE;
-        formPanel.add(new JLabel("Deskripsi:"), gbc);
+        formPanel.add(new JLabel("Deskripsi (Opsional):"), gbc);
         gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL;
         formPanel.add(txtDeskripsi, gbc);
         
@@ -153,7 +154,13 @@ public class TambahTransaksiDialog extends JDialog {
             }
             
             // Buat transaksi baru
-            Transaksi transaksi = new Transaksi(tanggal, kategori, deskripsi, jenis, jumlah);
+            Transaksi transaksi = new Transaksi(
+            LocalDateTime.now(), 
+            (String) cmbKategori.getSelectedItem(),
+            txtDeskripsi.getText(), 
+            Transaksi.JenisTransaksi.valueOf(cmbJenis.getSelectedItem().toString()),
+            new BigDecimal(txtJumlah.getText())
+            );
             
             // Simpan ke database
             if (transaksiDAO.tambahTransaksi(transaksi)) {
