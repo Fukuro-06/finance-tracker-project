@@ -1,6 +1,12 @@
-package com.example.financetracker.database;
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package com.one.financetracker.database;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,15 +30,15 @@ public class DatabaseManager {
     }
 
     private void initializeDatabase() {
-        try (Connection conn = getConnection()) {
+    try (Connection conn = getConnection()) {
             // Membuat tabel transaksi
             String createTransaksiTable = """
-                CREATE TABLE IF NOT EXISTS transaksi (
+                CREATE TABLE IF NOT EXISTS transaksi(
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    tanggal DATE NOT NULL,
+                    tanggal TIMESTAMP NOT NULL,
                     kategori VARCHAR(50) NOT NULL,
                     deskripsi TEXT,
-                    jenis VARCHAR(10) NOT NULL CHECK(jenis IN ('PEMASUKAN', 'PENGELUARAN')),
+                    jenis VARCHAR(10) NOT NULL CHECK(jenis IN('PEMASUKAN','PENGELUARAN')),
                     jumlah DECIMAL(15,2) NOT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
@@ -46,6 +52,7 @@ public class DatabaseManager {
                     jenis VARCHAR(10) NOT NULL CHECK(jenis IN ('PEMASUKAN', 'PENGELUARAN'))
                 )
             """;
+            
 
             Statement stmt = conn.createStatement();
             stmt.execute(createTransaksiTable);
@@ -56,10 +63,11 @@ public class DatabaseManager {
             e.printStackTrace();
         }
     }
-
+    
+    // Method Jenis Pemasukan dan Pengeluaran
     private void insertDefaultKategori(Connection conn) throws SQLException {
-        String[] pemasukanKategori = {"Gaji", "Bonus", "Investasi", "Lain-lain"};
-        String[] pengeluaranKategori = {"Makanan", "Transport", "Belanja", "Tagihan", "Hiburan"};
+        String[] pemasukanKategori = {"Gaji", "Bonus", "Investasi", "Tabungan", "Lain-lain"};
+        String[] pengeluaranKategori = {"Makanan", "Transport", "Belanja", "Tagihan", "Hiburan", "Lain-lain"};
 
         String insertKategori = "INSERT OR IGNORE INTO kategori(nama, jenis) VALUES(?, ?)";
         PreparedStatement pstmt = conn.prepareStatement(insertKategori);
