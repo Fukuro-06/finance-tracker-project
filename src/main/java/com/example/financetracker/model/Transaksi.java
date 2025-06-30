@@ -1,11 +1,15 @@
-package com.example.financetracker.model;
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package com.one.financetracker.model;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.math.BigDecimal;
 
 public class Transaksi {
     private int id;
-    private LocalDate tanggal;
+    private LocalDateTime tanggal;
     private String kategori;
     private String deskripsi;
     private JenisTransaksi jenis;
@@ -15,7 +19,8 @@ public class Transaksi {
 
     public Transaksi() {}
 
-    public Transaksi(LocalDate tanggal, String kategori, String deskripsi, JenisTransaksi jenis, BigDecimal jumlah) {
+    public Transaksi(LocalDateTime tanggal, String kategori, String deskripsi, JenisTransaksi jenis, BigDecimal jumlah) {
+        this.id = id;
         this.tanggal = tanggal;
         this.kategori = kategori;
         this.deskripsi = deskripsi;
@@ -24,11 +29,11 @@ public class Transaksi {
     }
 
     // Getter dan Setter
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public int getId() {return id; }
+    public void setId(int id) {this.id = id; }
 
-    public LocalDate getTanggal() { return tanggal; }
-    public void setTanggal(LocalDate tanggal) { this.tanggal = tanggal; }
+    public LocalDateTime getTanggal() { return tanggal; }
+    public void setTanggal(LocalDateTime tanggal) { this.tanggal = tanggal; }
 
     public String getKategori() { return kategori; }
     public void setKategori(String kategori) { this.kategori = kategori; }
